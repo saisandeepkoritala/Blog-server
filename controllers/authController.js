@@ -1,0 +1,370 @@
+const User = require("../Models/userModel");
+const TempUser = require("../Models/tempUser");
+const jwt = require("jsonwebtoken");
+const send = require("../Utils/email");
+
+const getToken = (email) => {
+    return jwt.sign({ email}, "MY-SECRET-KEY-TO-HASH-THE-LOGIN",{expiresIn:'1d'});
+};
+
+
+exports.loginUser = async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email }).select("+password");
+        const encoded = await user.correctPassword(password, user.password);
+
+
+        const token = getToken(user.email);
+
+        user.password = undefined;
+        if (encoded) {
+            res.cookie("Access_token", token, {
+                    httpOnly: true,
+                    secure: true,
+                })
+                .status(200)
+                .json({
+                    status: "success",
+                    token,
+                    data: {
+                        user,
+                    },
+                });
+        } else {
+            res.status(400).json({
+                status: "Fail",
+                error: "error",
+                message: "Password not matched",
+            });
+        }
+    } catch (e) {
+        res.status(401).json({
+            status: "Fail",
+            error: "error",
+        });
+    }
+};
+
+exports.signUp = async (req, res, next) => {
+    try {
+        const newUser = await User.create({
+            userName: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+            passwordConfirm: req.body.passwordConfirm,
+            accountCreatedAt: new Date(),
+            passwordLastRestedAt: new Date(),
+            passwordLastUpdatedAt: new Date(),
+
+        });
+
+        const token = getToken(newUser.email);
+
+        await TempUser.deleteOne({email:newUser.email}) 
+
+        res.cookie("Access_token", token, {
+            httpOnly: true,
+            secure: true,
+            })
+            .status(200)
+            .json({
+                status: "success",
+                token,
+                data: {
+                    user: newUser,
+                },
+            });
+
+            if(newUser){
+
+            }
+    } catch (e) {
+        res.status(401).json({
+            status: "Fail",
+            error: e,
+        });
+    }
+};
+
+
+exports.verifyCode=async(req,res,next)=>{
+    try{
+        const {email,code} = req.body;
+
+        const tempuser = await TempUser.findOne({email:email,
+            code:code,expiresIn: { $gt: new Date() }})
+        if(tempuser){
+            res.status(200).json({
+                status:"success",
+                message:"verified"
+            })
+        }
+        else{
+            res.status(401).json({
+                status:"Fail",
+                message:"OTP expired"
+            })
+        }
+    }
+    catch(e){
+
+    }
+}
+
+exports.sendCode=async(req,res,next)=>{
+    try{
+        console.log(req.body)
+        const {name,email}=req.body;
+        const duplicate= await User.findOne({email})
+        if(duplicate){
+            res.status(401).json({
+                status:"Fail",
+                message:"Email already existed"
+            })
+        }
+        else{
+
+            const alreadyTempUser = await TempUser.findOne({email}) 
+            if(!alreadyTempUser){
+                const message=Math.floor(Math.random()*1000000);
+                send({
+                    email:`${email}`,
+                    subject: "USE THE OTP BELOW",
+                    message:`${message}`
+                }).then(resp => {
+                    res.status(200).json({
+                        status:"success",
+                        message:"code sent",
+                        resp
+                    })
+                }).catch(error => {
+                    res.status(400).json({
+                        status:"Fail",
+                        message:"Try Again",
+                        error
+                    })
+                });
+                const currentDate = new Date();
+                const futureDate = new Date(currentDate.getTime() + 10 *60* 1000); 
+                const resp = await TempUser.create({
+                    userName:name,email,code:message,expiresIn:futureDate
+                })
+
+                }
+                else{
+                    const message= Math.floor(Math.random()*1000000);
+                    const currentDate = new Date();
+                    alreadyTempUser.expiresIn = new Date(currentDate.getTime() + 10 *60* 1000); 
+                    alreadyTempUser.code = message;
+                    await alreadyTempUser.save();
+
+                    send({
+                        email:`${email}`,
+                        subject: "RESENDING OTP",
+                        message:`${message}`
+                    }).then(resp => {
+                        res.status(200).json({
+                            status:"success resending",
+                            message:"code sent again",
+                            resp
+                        })
+                    }).catch(error => {
+                        res.status(400).json({
+                            status:"Fail Resending",
+                            message:"For some Reason Failed",
+                            error
+                        })
+                    });
+
+                }
+        }
+    }
+    catch(e){
+        console.log("hello",e)
+    }
+}
+
+exports.secureRoute=async(req,res,next)=>{
+    console.log(req.cookies)
+    const token = req.cookies.Access_token;
+    console.log("token",token)
+
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    jwt.verify(token, 'MY-SECRET-KEY-TO-HASH-THE-LOGIN', (err, decoded) => {
+        if (err) {
+        return res.status(401).json({ message: 'Token is not valid' });
+        }
+
+        req.user = decoded;
+        next();
+    });
+}
+
+
+exports.updatePassword = async(req,res,next)=>{
+    console.log(req.body)
+    try{
+
+        const isUser = await User.findOne({email:req.body.email}).select("+password")
+        if(!isUser){
+            res.json({
+                status:"fail",
+                message:"invalid details"
+            })
+        }
+
+        const isPasswordCorrect = await isUser.correctPassword(req.body.password, isUser.password);
+
+        // console.log(isPasswordCorrect)
+
+        if(!isPasswordCorrect){
+            return res.json({
+                status:"failll",
+                message:"password diff"
+            })
+        }
+
+        res.status(200).json({
+            status:"success",
+            message:"hi"
+        })
+
+    }
+
+    catch(e){
+        res.json({
+            status:"failll"
+        })
+
+    }
+}
+exports.modifyPassword = async (req, res, next) => {
+    try {
+        console.log(req.body);
+
+        const user = await User.findOne({ email: req.body.email }).select("+password");
+
+        if (!user) {
+            return res.status(404).json({
+                status: "fail",
+                message: "User not found"
+            });
+        }
+
+        // Check if password has at least 8 characters after trimming
+        if (req.body.password.trim().length < 8) {
+            return res.status(400).json({
+                status: "fail",
+                message: "Password must be at least 8 characters long"
+            });
+        }
+
+        user.userPassword = req.body.password;
+        user.password = req.body.password;
+        await user.save({ validateBeforeSave: false });
+
+        res.status(200).json({
+            status: "success",
+            message: "Password updated successfully"
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            status: "error",
+            message: "An error occurred while updating password"
+        });
+    }
+};
+
+
+exports.forgotPassword = async(req,res,next)=>{
+    try{
+        console.log(req.body)
+
+        const isEmailValid = await User.findOne({email:req.body.email})
+        if(!isEmailValid){
+            return res.status(400).json({
+                status: "error",
+                message: "No email present "
+            });
+        }
+
+        const message= Math.floor(Math.random()*1000000);
+        isEmailValid.passwordToken = message;
+        await isEmailValid.save({validateBeforeSave:false}); 
+
+        send({
+            email:`${req.body.email}`,
+            subject: "Forgot Password",
+            message:`${message}`
+        }).then(resp => {
+            res.status(200).json({
+                status:"success",
+                message:"code sent,sending reset token to email",
+                resp
+            })
+        }).catch(error => {
+            res.status(400).json({
+                status:"Fail",
+                message:"For some Reason email Failed",
+                error
+            })
+        });
+
+    }
+    catch(e){
+            res.status(400).json({
+            status:"Fail catch",
+            message:"For some Reason email Failed,again",
+        })
+    }
+}
+
+
+exports.verifyForgotOtp = async (req, res, next) => {
+    try {
+        // console.log(req.body);
+        const user = await User.findOne({ email: req.body.email, passwordToken: req.body.otp });
+        
+        // console.log("user is ", user);
+        if (!user) {
+            return res.status(422).json({
+                status: "OTP Incorrect",
+                message: "Wrong OTP"
+            });
+        } else {
+            return res.json({
+                status: "success",
+                message: "OTP verification successful"
+            });
+        }
+    } catch (error) {
+        console.error("Error in verifyForgotOtp:", error);
+        return res.status(500).json({
+            status: "Failed to verify OTP",
+            message: "Failed to verify OTP. Please try again.",
+            error: error.message
+        });
+    }
+};
+
+exports.logOut = async(req,res,next)=>{
+    try{
+        console.log("bro",req.token)
+        res.clearCookie('Access_token').status(200).json({
+            status:"ok"
+        });
+    }
+    catch(e){
+        return res.status(500).json({
+            status: "error",
+            message: "Please try again.",
+            error: e.message
+        });
+        
+    }
+}
