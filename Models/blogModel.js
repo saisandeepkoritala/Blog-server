@@ -5,7 +5,8 @@ const BlogSchema = new mongoose.Schema({
     
     title:{
         type:String,
-        required:[true,"Title not Provided"]
+        required:[true,"Title not Provided"],
+        unique:[true,"Title already exists"]
     },
     body:{
         type:mongoose.Schema.Types.Mixed,
