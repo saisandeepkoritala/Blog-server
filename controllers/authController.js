@@ -188,7 +188,7 @@ exports.sendCode=async(req,res,next)=>{
 exports.secureRoute=async(req,res,next)=>{
     // console.log(req.cookies)
     const token = req.cookies.Access_token;
-    // console.log("token",token)
+    console.log("token",token)
 
     if (!token) {
         return res.status(401).json({ message: 'Unauthorized' });

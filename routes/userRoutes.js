@@ -16,14 +16,14 @@ const {loginUser,signUp,
     verifyForgotOtp,logOut} = require("../controllers/authController");
 
 
-const {getAllBlogs,createBlog} = require("../controllers/blogController");
+const {getAllBlogs,createBlog,getBlogById} = require("../controllers/blogController");
 
 const Router = express.Router();
 
 
 Router.route("/allBlogs").get(getAllBlogs);
-Router.route("/createBlog").post(createBlog);
-
+Router.route("/createBlog").post(secureRoute,createBlog);
+Router.route("/blog/:id").get(secureRoute,getBlogById);
 
 Router.route("/isAlive").get(isAlive);
 Router.route("/login").post(loginUser);
@@ -35,13 +35,7 @@ Router.route("/updatePassword").post(updatePassword);
 Router.route("/modifyPassword").post(modifyPassword);
 Router.route("/verifyForgotOtp").post(verifyForgotOtp);
 
-
-
 Router.route("/logout").post(secureRoute,logOut);
-
-
-
-
 
 const passport = require('passport'); 
 require('../passport');
@@ -73,7 +67,8 @@ Router.get('/auth/google/callback',
                 httpOnly: true,
                 secure: true,
             });
-            res.redirect(`http://localhost:5173?userData=${userData}`)
+            // res.redirect(`http://localhost:5173?userData=${userData}`)
+            res.redirect(`https://saisandeep-blog.netlify.app?userData=${userData}`)
     }
 );
 

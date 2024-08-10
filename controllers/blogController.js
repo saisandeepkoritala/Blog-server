@@ -42,3 +42,23 @@ exports.createBlog = async (req, res, next) => {
         })
     }
 }
+
+exports.getBlogById = async (req, res, next) => {
+    try{
+        // console.log("hi raaaa",req.body)
+        console.log("hi raaaa",req.params)
+        const blog = await Blog.findById(req.params.id);
+        res.status(200).json({
+            status:"success",
+            message:"okay",
+            blog
+        })
+    }
+    catch(e){
+        console.log(e)
+        res.status(400).json({
+            status:"fail",
+            message:"error"
+        })
+    }
+}
