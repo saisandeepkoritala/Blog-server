@@ -22,6 +22,7 @@ exports.loginUser = async (req, res, next) => {
             res.cookie("Access_token", token, {
                     httpOnly: true,
                     secure: true,
+                    SameSite: "none",
                 })
                 .status(200)
                 .json({
@@ -66,6 +67,7 @@ exports.signUp = async (req, res, next) => {
         res.cookie("Access_token", token, {
             httpOnly: true,
             secure: true,
+            SameSite: "none",
             })
             .status(200)
             .json({

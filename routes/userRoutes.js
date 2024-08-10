@@ -67,7 +67,7 @@ Router.get('/auth/google/callback',
                 httpOnly: true,
                 secure: true,
             });
-            // res.redirect(`http://localhost:5173?userData=${userData}`)
+            //res.redirect(`http://localhost:5173?userData=${userData}`)
             res.redirect(`https://saisandeep-blog.netlify.app?userData=${userData}`)
     }
 );
