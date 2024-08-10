@@ -18,7 +18,11 @@ app.use(express.static("public"))
 app.use(session({
     resave: false,
     saveUninitialized: true,
-    secret:"SECRET_HERE_BRO"
+    secret:"SECRET_HERE_BRO",
+    cookie:{
+        sameSite:'none',
+        secure: true,
+    }
 }));
 
 app.use(cors({
