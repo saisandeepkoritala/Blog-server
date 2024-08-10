@@ -7,9 +7,12 @@ const session = require('express-session');
 
 
 const app = express();
+
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
+
 app.use(express.static("public"))
 
 app.use(session({
@@ -20,7 +23,7 @@ app.use(session({
 
 app.use(cors({
     credentials: true,
-    origin: ["http://localhost:3000", "http://localhost:5173"]
+    origin: ["http://localhost:3000", "http://localhost:5173",]
     }));
 
 app.use("/api/v1/user",userRouter);

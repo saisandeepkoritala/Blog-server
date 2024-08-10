@@ -1,25 +1,23 @@
 const mongoose = require("mongoose");
 
 const BlogSchema = new mongoose.Schema({
+
+    
     title:{
         type:String,
         required:[true,"Title not Provided"]
     },
-    message:{
-        type:String,
-        required:[true,"Message not Provided"],
-    },
-    skills:{
+    body:{
         type:mongoose.Schema.Types.Mixed,
-        required:[true,"Need Tags"]
+        required:[true,"Body not Provided"],
     },
-    image:{
-        type:String,
-        required:[true,"Need image"]
+    tags:{
+        type:Array,
+        required:[true,"Need tags"]
     },
+
     name:{
         type:String,
-        required:[true,"Need name"]
     },
     email:{
         type:String,
@@ -37,5 +35,4 @@ const BlogSchema = new mongoose.Schema({
 })
 
 const Blog = mongoose.model("blogs",BlogSchema);
-
-module.exports = Image;
+module.exports = Blog;

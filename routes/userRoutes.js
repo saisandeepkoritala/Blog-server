@@ -16,12 +16,15 @@ const {loginUser,signUp,
     verifyForgotOtp,logOut} = require("../controllers/authController");
 
 
-const {getAllBlogs} = require("../controllers/blogController");
+const {getAllBlogs,createBlog} = require("../controllers/blogController");
 
 const Router = express.Router();
 
 
-Router.route("/allBlogs").get(secureRoute,getAllBlogs);
+Router.route("/allBlogs").get(getAllBlogs);
+Router.route("/createBlog").post(createBlog);
+
+
 Router.route("/isAlive").get(isAlive);
 Router.route("/login").post(loginUser);
 Router.route("/signup").post(signUp);
@@ -31,7 +34,14 @@ Router.route("/forgotPassword").post(forgotPassword);
 Router.route("/updatePassword").post(updatePassword);
 Router.route("/modifyPassword").post(modifyPassword);
 Router.route("/verifyForgotOtp").post(verifyForgotOtp);
+
+
+
 Router.route("/logout").post(secureRoute,logOut);
+
+
+
+
 
 const passport = require('passport'); 
 require('../passport');
