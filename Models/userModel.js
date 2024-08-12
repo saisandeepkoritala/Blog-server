@@ -9,9 +9,9 @@ const userSchema = mongoose.Schema({
     },
     email:{
         type:String,
+        unique:[true,"Email already exists"],
+        validate:[validator.isEmail,"Email is not valid"],
         required:[true,"Email is Needed"],
-        unique:true,
-        validate:[validator.isEmail,"Please Provide a valid email"]
     },
     password:{
         type:String,
@@ -31,6 +31,13 @@ const userSchema = mongoose.Schema({
         }
     },
 
+    accountType:{
+        type:Array,
+        required:[true,"Account Type is needed for user"]
+    },
+    picture:{
+        type:String
+    },
     accountCreatedAt:{
         type:Date
     },

@@ -14,12 +14,3 @@ exports.isAlive = async(req,res,next)=>{
     }
 }
 
-
-exports.successGoogleLogin = (req , res) => { 
-	if(!req.user) 
-		res.redirect('/failure'); 
-}
-
-exports.failureGoogleLogin = (req , res) => { 
-	res.send("Error"); 
-}

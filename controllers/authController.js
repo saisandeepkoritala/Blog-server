@@ -11,7 +11,7 @@ const getToken = (email) => {
 exports.loginUser = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email }).select("+password");
+        const user = await User.findOne({ email:email,accountType:"normal"}).select("+password");
         const encoded = await user.correctPassword(password, user.password);
 
 
@@ -49,76 +49,83 @@ exports.loginUser = async (req, res, next) => {
 
 exports.signUp = async (req, res, next) => {
     try {
-        const newUser = await User.create({
-            userName: req.body.name,
-            email: req.body.email,
-            password: req.body.password,
-            passwordConfirm: req.body.passwordConfirm,
-            accountCreatedAt: new Date(),
-            passwordLastRestedAt: new Date(),
-            passwordLastUpdatedAt: new Date(),
+        // Validate password confirmation
+        if (req.body.password !== req.body.passwordConfirm) {
+            return res.status(400).json({
+                status: 'Fail',
+                error: 'Passwords do not match'
+            });
+        }
 
-        });
+        // Check for existing user
+        const isAlreadyUser = await User.findOne({ email: req.body.email });
+        let newUser;
 
+        // Handle different account types
+        if (isAlreadyUser?.accountType?.includes("google")) {
+            // User has a Google account and needs to add a normal account
+
+            isAlreadyUser.accountType.push("normal");
+            isAlreadyUser.password = req.body.password;
+            isAlreadyUser.passwordConfirm = req.body.passwordConfirm;
+
+            await isAlreadyUser.save({ validateBeforeSave: false });
+            newUser = isAlreadyUser;
+        } else {
+            // User does not have a Google account and needs to add a normal account
+            newUser = new User({
+                userName: req.body.name,
+                email: req.body.email,
+                password: req.body.password,
+                passwordConfirm: req.body.passwordConfirm,
+                accountType: ["normal"],
+                accountCreatedAt: new Date(),
+                passwordLastRestedAt: new Date(),
+                passwordLastUpdatedAt: new Date(),
+            });
+            await newUser.save();
+        }
+
+
+        // Generate and send token
         const token = getToken(newUser.email);
-
-        await TempUser.deleteOne({email:newUser.email}) 
+        await TempUser.deleteOne({ email: newUser.email });
 
         res.cookie("Access_token", token, {
             httpOnly: true,
             secure: true,
             sameSite: "none"
-            })
-            .status(200)
-            .json({
-                status: "success",
-                token,
-                data: {
-                    user: newUser,
-                },
-            });
+        })
+        .status(200)
+        .json({
+            status: "success",
+            token,
+            data: {
+                user: newUser,
+            },
+        });
 
-            if(newUser){
-
-            }
     } catch (e) {
-        res.status(401).json({
+        console.error("Error during sign up:", e);
+        res.status(500).json({
             status: "Fail",
-            error: e,
+            error: e.message || "Internal Server Error",
         });
     }
 };
 
 
-exports.verifyCode=async(req,res,next)=>{
-    try{
-        const {email,code} = req.body;
-
-        const tempuser = await TempUser.findOne({email:email,
-            code:code,expiresIn: { $gt: new Date() }})
-        if(tempuser){
-            res.status(200).json({
-                status:"success",
-                message:"verified"
-            })
-        }
-        else{
-            res.status(401).json({
-                status:"Fail",
-                message:"OTP expired"
-            })
-        }
-    }
-    catch(e){
-
-    }
-}
-
 exports.sendCode=async(req,res,next)=>{
     try{
         console.log(req.body)
         const {name,email}=req.body;
-        const duplicate= await User.findOne({email})
+
+        const duplicate = await User.findOne({
+            email: email,
+            accountType: { $in: ["normal"] }
+        });
+
+        console.log(duplicate)
         if(duplicate){
             res.status(401).json({
                 status:"Fail",
@@ -127,7 +134,7 @@ exports.sendCode=async(req,res,next)=>{
         }
         else{
 
-            const alreadyTempUser = await TempUser.findOne({email}) 
+            const alreadyTempUser = await TempUser.findOne({email:email}) 
             if(!alreadyTempUser){
                 const message=Math.floor(Math.random()*1000000);
                 send({
@@ -249,7 +256,7 @@ exports.modifyPassword = async (req, res, next) => {
     try {
         console.log(req.body);
 
-        const user = await User.findOne({ email: req.body.email }).select("+password");
+        const user = await User.findOne({ email: req.body.email}).select("+password");
 
         if (!user) {
             return res.status(404).json({
@@ -288,7 +295,7 @@ exports.forgotPassword = async(req,res,next)=>{
     try{
         console.log(req.body)
 
-        const isEmailValid = await User.findOne({email:req.body.email})
+        const isEmailValid = await User.findOne({email:req.body.email});
         if(!isEmailValid){
             return res.status(400).json({
                 status: "error",
@@ -331,7 +338,7 @@ exports.forgotPassword = async(req,res,next)=>{
 exports.verifyForgotOtp = async (req, res, next) => {
     try {
         // console.log(req.body);
-        const user = await User.findOne({ email: req.body.email, passwordToken: req.body.otp });
+        const user = await User.findOne({ email: req.body.email, passwordToken: req.body.otp, });
         
         // console.log("user is ", user);
         if (!user) {
@@ -369,5 +376,55 @@ exports.logOut = async(req,res,next)=>{
             error: e.message
         });
         
+    }
+}
+
+exports.verifyCode=async(req,res,next)=>{
+    try{
+        const {email,code} = req.body;
+
+        const tempuser = await TempUser.findOne({email:email,
+            code:code,expiresIn: { $gt: new Date() }})
+        if(tempuser){
+            res.status(200).json({
+                status:"success",
+                message:"verified"
+            })
+        }
+        else{
+            res.status(401).json({
+                status:"Fail",
+                message:"OTP expired"
+            })
+        }
+    }
+    catch(e){
+
+    }
+}
+
+
+exports.profilePic=async(req,res,next)=>{
+    try{
+
+        console.log(req.body)
+        const user = await User.findOne({email:req.body.email});
+        console.log(user)
+
+        if(!user.picture){
+            return res.status(404).json({
+                status:"fail",
+                message:"user pic not found"
+            })
+        }
+        else{
+            return res.status(200).json({
+                status:"success",
+                pic:user.picture
+            })
+        }
+    }
+    catch(e){
+        console.log(e)
     }
 }

@@ -8,9 +8,9 @@ const tempUser = new mongoose.Schema({
     },
     email:{
         type:String,
+        unique:[true,"Email already exists"],
         required:[true,"Email not Provided"],
-        unique:true,
-        validate:[validator.isEmail,"Please Provide a valid email"]
+        validate:[validator.isEmail,"Email is not valid"]
     },
     code:{
         type:String,
