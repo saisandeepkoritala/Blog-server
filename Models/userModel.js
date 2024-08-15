@@ -42,15 +42,23 @@ const userSchema = mongoose.Schema({
         type:Date
     },
 
+
+
     passwordLastRestedAt:{
         type:Date
     },
+
+
+    
+
     passwordResetToken:{
         type:String
     },
     passwordResetTokenExpires:{
         type:Date
     },
+
+
 
     passwordLastUpdatedAt:{
         type:Date

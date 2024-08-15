@@ -3,8 +3,6 @@ const jwt = require("jsonwebtoken");
 const User = require("../Models/userModel");
 
 const {
-    successGoogleLogin,
-    failureGoogleLogin,
     isAlive }= require("../controllers/userController");
 
 const {loginUser,signUp,
@@ -26,16 +24,22 @@ const Router = express.Router();
 Router.route("/allBlogs").get(getAllBlogs);
 Router.route("/createBlog").post(createBlog);
 Router.route("/blog/:id").get(getBlogById);
+
 Router.route("/profilePic").post(profilePic)
+
 Router.route("/isAlive").get(isAlive);
 Router.route("/login").post(loginUser);
 Router.route("/signup").post(signUp);
 Router.route("/sendCode").post(sendCode);
 Router.route("/verifyCode").post(verifyCode);
-Router.route("/forgotPassword").post(forgotPassword);
+
+Router.route("/forgotPassword").post(forgotPassword); //1
+
 Router.route("/updatePassword").post(updatePassword);
-Router.route("/modifyPassword").post(modifyPassword);
-Router.route("/verifyForgotOtp").post(verifyForgotOtp);
+
+Router.route("/modifyPassword").post(modifyPassword);  //3
+
+Router.route("/verifyForgotOtp").post(verifyForgotOtp); //2
 
 Router.route("/logout").post(logOut);
 

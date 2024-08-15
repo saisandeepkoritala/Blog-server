@@ -238,6 +238,15 @@ exports.updatePassword = async(req,res,next)=>{
             })
         }
 
+        isUser.password = req.body.password;
+        isUser.passwordConfirm = req.body.passwordConfirm;
+
+        isUser.passwordLastUpdatedAt = new Date();
+
+        isUser.passwordLastRestedAt = new Date();
+
+        await isUser.save({validateBeforeSave: false});
+
         res.status(200).json({
             status:"success",
             message:"hi"
@@ -293,18 +302,20 @@ exports.modifyPassword = async (req, res, next) => {
 
 exports.forgotPassword = async(req,res,next)=>{
     try{
-        console.log(req.body)
+        console.log("ungaaaa",req.body)
 
-        const isEmailValid = await User.findOne({email:req.body.email});
+        const isEmailValid = await User.findOne({email:req.body.email,accountType:{$in:["normal"]}});
+
         if(!isEmailValid){
             return res.status(400).json({
                 status: "error",
-                message: "No email present "
+                message: "No account present "
             });
         }
 
         const message= Math.floor(Math.random()*1000000);
-        isEmailValid.passwordToken = message;
+        isEmailValid.passwordResetToken = message;
+        isEmailValid.passwordResetTokenExpires = Date.now() + 10 * 60 * 1000;
         await isEmailValid.save({validateBeforeSave:false}); 
 
         send({
