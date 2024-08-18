@@ -23,9 +23,9 @@ const {getAllBlogs,
 const Router = express.Router();
 
 
-Router.route("/allBlogs").get(getAllBlogs);
-Router.route("/createBlog").post(createBlog);
-Router.route("/blog/:id").get(getBlogById);
+Router.route("/allBlogs").get(secureRoute,getAllBlogs);
+Router.route("/createBlog").post(secureRoute,createBlog);
+Router.route("/blog/:id").get(secureRoute,getBlogById);
 
 Router.route("/profilePic").post(profilePic)
 
@@ -43,7 +43,7 @@ Router.route("/modifyPassword").post(modifyPassword);  //3
 
 Router.route("/verifyForgotOtp").post(verifyForgotOtp); //2
 
-Router.route("/logout").post(logOut);
+Router.route("/logout").post(secureRoute,logOut);
 
 const passport = require('passport'); 
 require('../passport');
