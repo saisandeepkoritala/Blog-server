@@ -103,7 +103,7 @@ Router.get('/auth/google/callback',
             res.cookie("Access_token", token, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "none",
+                sameSite: "None",
 
             });
         
