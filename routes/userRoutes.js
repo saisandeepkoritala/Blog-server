@@ -2,8 +2,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("../Models/userModel");
 
-const {
-    isAlive }= require("../controllers/userController");
+const {isAlive }= require("../controllers/userController");
 
 const {loginUser,signUp,
     profilePic,
@@ -13,10 +12,13 @@ const {loginUser,signUp,
     forgotPassword,
     updatePassword,
     modifyPassword,
-    verifyForgotOtp,logOut} = require("../controllers/authController");
+    verifyForgotOtp,
+    logOut} = require("../controllers/authController");
 
 
-const {getAllBlogs,createBlog,getBlogById} = require("../controllers/blogController");
+const {getAllBlogs,
+    createBlog,
+    getBlogById} = require("../controllers/blogController");
 
 const Router = express.Router();
 

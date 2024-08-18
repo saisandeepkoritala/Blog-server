@@ -7,12 +7,9 @@ const session = require('express-session');
 
 
 const app = express();
-
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
-
 app.use(cors({
     credentials: true,
     origin: ["http://localhost:3000", "http://localhost:5173","https://saisandeep-blog.netlify.app"]
@@ -25,7 +22,7 @@ app.use(session({
     saveUninitialized: true,
     secret:"SECRET_HERE_BRO",
     cookie:{
-        sameSite:'none',
+        sameSite:'lax',
         secure: true,
     }
 }));

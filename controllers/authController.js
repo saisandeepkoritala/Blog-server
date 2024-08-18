@@ -22,7 +22,8 @@ exports.loginUser = async (req, res, next) => {
             res.cookie("Access_token", token, {
                     httpOnly: true,
                     secure: true,
-                    sameSite:"none",
+                    sameSite:"lax",
+                    domain:"https://saisandeep-blog.netlify.app",
                 })
                 .status(200)
                 .json({
@@ -94,7 +95,8 @@ exports.signUp = async (req, res, next) => {
         res.cookie("Access_token", token, {
             httpOnly: true,
             secure: true,
-            sameSite: "none"
+            sameSite: "lax",
+            domain:"https://saisandeep-blog.netlify.app",
         })
         .status(200)
         .json({

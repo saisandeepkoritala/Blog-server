@@ -24,6 +24,7 @@
     "nodemon": "^3.1.4",
     "passport": "^0.7.0",
     "passport-google-oauth2": "^0.2.0",
+    "server": "file:",
     "validator": "^13.12.0"
   }
 }
