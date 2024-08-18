@@ -24,8 +24,8 @@ const Router = express.Router();
 
 
 Router.route("/allBlogs").get(getAllBlogs);
-Router.route("/createBlog").post(secureRoute,createBlog);
-Router.route("/blog/:id").get(secureRoute,getBlogById);
+Router.route("/createBlog").post(createBlog);
+Router.route("/blog/:id").get(getBlogById);
 
 Router.route("/profilePic").post(profilePic)
 
