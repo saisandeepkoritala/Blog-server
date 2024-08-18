@@ -100,8 +100,6 @@ Router.get('/auth/google/callback',
                 await newUser.save({validateBeforeSave: false});
             }
         }
-
-
             res.cookie("Access_token", token, {
                 httpOnly: true,
                 secure: true,
@@ -109,9 +107,7 @@ Router.get('/auth/google/callback',
                 domain:"https://saisandeep-blog.netlify.app",
 
             });
-            res.header("Access-Control-Allow-Credentials", "true");
-            res.header("Access-Control-Allow-Origin", "https://saisandeep-blog.netlify.app");
-
+        
             //res.redirect(`http://localhost:5173?userData=${userData}`)
             res.redirect(`https://saisandeep-blog.netlify.app?userData=${userData}`)
 }

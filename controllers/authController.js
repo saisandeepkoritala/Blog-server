@@ -33,8 +33,6 @@ exports.loginUser = async (req, res, next) => {
                         user,
                     },
                 });
-                res.header("Access-Control-Allow-Credentials", "true");
-                res.header("Access-Control-Allow-Origin", "https://saisandeep-blog.netlify.app");
         } else {
             res.status(400).json({
                 status: "Fail",
@@ -108,8 +106,6 @@ exports.signUp = async (req, res, next) => {
                 user: newUser,
             },
         });
-        res.header("Access-Control-Allow-Credentials", "true");
-        res.header("Access-Control-Allow-Origin", "https://saisandeep-blog.netlify.app");
 
     } catch (e) {
         console.error("Error during sign up:", e);
