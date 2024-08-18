@@ -104,6 +104,7 @@ Router.get('/auth/google/callback',
                 httpOnly: true,
                 secure: true,
                 sameSite: "None",
+                domain:["http://localhost:3000",'http://localhost:5173','https://saisandeep-blog.netlify.app']
 
             });
         

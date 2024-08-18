@@ -3,6 +3,7 @@ const TempUser = require("../Models/tempUser");
 const jwt = require("jsonwebtoken");
 const send = require("../Utils/email");
 
+
 const getToken = (email) => {
     return jwt.sign({ email}, "MY-SECRET-KEY-TO-HASH-THE-LOGIN",{expiresIn:'1d'});
 };
@@ -23,7 +24,7 @@ exports.loginUser = async (req, res, next) => {
                     httpOnly: true,
                     secure: true,
                     sameSite:"None",
-
+                    domain:["http://localhost:3000",'http://localhost:5173','https://saisandeep-blog.netlify.app']
                 })
                 .status(200)
                 .json({
@@ -96,6 +97,7 @@ exports.signUp = async (req, res, next) => {
             httpOnly: true,
             secure: true,
             sameSite: "None",
+            domain:["http://localhost:3000",'http://localhost:5173','https://saisandeep-blog.netlify.app']
         })
         .status(200)
         .json({
