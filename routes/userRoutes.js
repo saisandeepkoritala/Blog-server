@@ -104,7 +104,6 @@ Router.get('/auth/google/callback',
                 httpOnly: true,
                 secure: true,
                 sameSite: "none",
-                domain:"https://saisandeep-blog.netlify.app",
 
             });
         

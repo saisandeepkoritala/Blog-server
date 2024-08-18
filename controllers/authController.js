@@ -23,7 +23,7 @@ exports.loginUser = async (req, res, next) => {
                     httpOnly: true,
                     secure: true,
                     sameSite:"none",
-                    domain:"https://saisandeep-blog.netlify.app",
+
                 })
                 .status(200)
                 .json({
@@ -96,7 +96,6 @@ exports.signUp = async (req, res, next) => {
             httpOnly: true,
             secure: true,
             sameSite: "none",
-            domain:"https://saisandeep-blog.netlify.app",
         })
         .status(200)
         .json({
