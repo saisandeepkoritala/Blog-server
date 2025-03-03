@@ -108,8 +108,8 @@ Router.get('/auth/google/callback',
 
             });
         
-            res.redirect(`http://localhost:5173?userData=${userData}`)
-            //res.redirect(`https://saisandeep-blog.netlify.app?userData=${userData}`)
+            //res.redirect(`http://localhost:5173?userData=${userData}`)
+            res.redirect(`https://saisandeep-blog.netlify.app?userData=${userData}`)
 }
 );
 
