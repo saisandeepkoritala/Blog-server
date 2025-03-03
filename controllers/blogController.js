@@ -18,30 +18,33 @@ exports.getAllBlogs = async (req, res, next) => {
 }
 
 exports.createBlog = async (req, res, next) => {
-    try{
-        console.log("hi raaaa",req.body)
+    try {
+        console.log("hi raaaa", req.body.email);
+
+        // Ensure email is a string
+        const email = typeof req.body.email === "object" ? req.body.email.email : req.body.email;
+
         const savedBlog = await Blog.create({
-            title:req.body.title,
-            body:req.body.body,
-            tags:req.body.tags,
-            email:req.body.email,
-            createdAt:Date.now()
-        })
+            title: req.body.title,
+            body: req.body.body,
+            tags: req.body.tags,
+            email: email, // Use extracted email
+            createdAt: Date.now(),
+        });
 
         res.status(200).json({
-            status:"success",
-            message:"okay",
-            data:savedBlog
-        })
-    }
-    catch(e){
-        console.log(e)
+            status: "success",
+            message: "okay",
+            data: savedBlog,
+        });
+    } catch (e) {
+        console.log(e);
         res.status(400).json({
-            status:"fail",
-            message:"error",
-        })
+            status: "fail",
+            message: "error",
+        });
     }
-}
+};
 
 exports.getBlogById = async (req, res, next) => {
     try{
