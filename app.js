@@ -19,7 +19,6 @@ app.use(cors({
 // Static files middleware
 app.use(express.static("public"));
 
-app.set("trust proxy", 1);
 // Session middleware
 app.use(session({
     resave: false,
