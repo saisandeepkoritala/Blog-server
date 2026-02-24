@@ -14,7 +14,7 @@ passport.use(new GoogleStrategy({
 	clientID:process.env.CLIENT_ID,
 	clientSecret:process.env.CLIENT_SECRET,
 	callbackURL:"https://blog-server-fw42.onrender.com/api/v1/user/auth/google/callback", 
-	// callbackURL:"http://localhost:5000/api/v1/user/auth/google/callback",
+	//callbackURL:"http://localhost:5000/api/v1/user/auth/google/callback",
 	passReqToCallback:true
 }, 
 function(request, accessToken, refreshToken, profile, done) { 
