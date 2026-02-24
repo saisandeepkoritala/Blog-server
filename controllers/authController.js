@@ -118,84 +118,56 @@ exports.signUp = async (req, res, next) => {
 };
 
 
-exports.sendCode=async(req,res,next)=>{
-    try{
-        console.log(req.body)
-        const {name,email}=req.body;
+exports.sendCode = async (req, res, next) => {
+    try {
+        const { name, email } = req.body;
 
+        // 1. Check if user already exists
         const duplicate = await User.findOne({
             email: email,
             accountType: { $in: ["normal"] }
         });
 
-        console.log(duplicate)
-        if(duplicate){
-            res.status(401).json({
-                status:"Fail",
-                message:"Email already existed"
-            })
+        if (duplicate) {
+            return res.status(401).json({
+                status: "Fail",
+                message: "Email already exists"
+            });
         }
-        else{
 
-            const alreadyTempUser = await TempUser.findOne({email:email}) 
-            if(!alreadyTempUser){
-                const message=Math.floor(Math.random()*1000000);
-                send({
-                    email:`${email}`,
-                    subject: "USE THE OTP BELOW",
-                    message:`${message}`
-                }).then(resp => {
-                    res.status(200).json({
-                        status:"success",
-                        message:"code sent",
-                        resp
-                    })
-                }).catch(error => {
-                    res.status(400).json({
-                        status:"Fail",
-                        message:"Try Again",
-                        error
-                    })
-                });
-                const currentDate = new Date();
-                const futureDate = new Date(currentDate.getTime() + 10 *60* 1000); 
-                const resp = await TempUser.create({
-                    userName:name,email,code:message,expiresIn:futureDate
-                })
+        // 2. Generate OTP and Expiry
+        const otpCode = Math.floor(100000 + Math.random() * 900000); // 6-digit code
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-                }
-                else{
-                    const message= Math.floor(Math.random()*1000000);
-                    const currentDate = new Date();
-                    alreadyTempUser.expiresIn = new Date(currentDate.getTime() + 10 *60* 1000); 
-                    alreadyTempUser.code = message;
-                    await alreadyTempUser.save();
+        // 3. Send Email first
+        await send({
+            email: email,
+            subject: "Your Verification Code",
+            message: `Your code is ${otpCode}. It expires in 10 minutes.`
+        });
 
-                    send({
-                        email:`${email}`,
-                        subject: "RESENDING OTP",
-                        message:`${message}`
-                    }).then(resp => {
-                        res.status(200).json({
-                            status:"success resending",
-                            message:"code sent again",
-                            resp
-                        })
-                    }).catch(error => {
-                        res.status(400).json({
-                            status:"Fail Resending",
-                            message:"For some Reason Failed",
-                            error
-                        })
-                    });
+        // 4. Update or Create TempUser record
+        await TempUser.findOneAndUpdate(
+            { email: email },
+            { userName: name, code: otpCode, expiresIn: expiresAt },
+            { upsert: true, new: true }
+        );
 
-                }
-        }
+        // 5. Send ONE final response
+        res.status(200).json({
+            status: "success",
+            message: "Code sent successfully"
+        });
+
+    } catch (e) {
+        console.error("Error in sendCode:", e);
+        res.status(500).json({
+            status: "Fail",
+            message: "Failed to send code. Please try again.",
+            error: e.message
+        });
     }
-    catch(e){
-        console.log("hello",e)
-    }
-}
+};
 
 exports.secureRoute=async(req,res,next)=>{
     // console.log(req.cookies)
