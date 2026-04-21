@@ -3,11 +3,19 @@ const TempUser = require("../Models/tempUser");
 const jwt = require("jsonwebtoken");
 const send = require("../Utils/email");
 
-
 const getToken = (email) => {
     return jwt.sign({ email}, "MY-SECRET-KEY-TO-HASH-THE-LOGIN",{expiresIn:'1d'});
 };
 
+const verifyToken = (token) => {
+    try {
+        // Replace 'MY-SECRET-KEY-TO-HASH-THE-LOGIN' with your actual environment variable
+        return jwt.verify(token, "MY-SECRET-KEY-TO-HASH-THE-LOGIN");
+    } catch (err) {
+        // If the token is expired, tampered with, or invalid, this will throw
+        return null; 
+    }
+};
 
 exports.loginUser = async (req, res, next) => {
     try {
@@ -15,7 +23,7 @@ exports.loginUser = async (req, res, next) => {
         const user = await User.findOne({ email:email,accountType:"normal"}).select("+password");
         const encoded = await user.correctPassword(password, user.password);
 
-
+        console.log(password,email)
         const token = getToken(user.email);
 
         user.password = undefined;
@@ -24,7 +32,8 @@ exports.loginUser = async (req, res, next) => {
                     httpOnly: true,
                     secure: true,
                     sameSite:"None",
-                    domain:["http://localhost:3000",'http://localhost:5173','https://saisandeep-blog.netlify.app']
+                    path: "/",
+                    // domain:["http://localhost:3000",'http://localhost:5173','https://saisandeep-blog.netlify.app']
                 })
                 .status(200)
                 .json({
@@ -45,6 +54,7 @@ exports.loginUser = async (req, res, next) => {
         res.status(401).json({
             status: "Fail",
             error: "error",
+            message:e
         });
     }
 };
@@ -97,7 +107,7 @@ exports.signUp = async (req, res, next) => {
             httpOnly: true,
             secure: true,
             sameSite: "None",
-            domain:["http://localhost:3000",'http://localhost:5173','https://saisandeep-blog.netlify.app']
+            path: "/",
         })
         .status(200)
         .json({

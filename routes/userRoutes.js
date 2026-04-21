@@ -22,9 +22,27 @@ const {getAllBlogs,
 
 const Router = express.Router();
 
+const verifyToken = (token) => {
+    try {
+        return jwt.verify(token.replace("Access_token=",""), "MY-SECRET-KEY-TO-HASH-THE-LOGIN");
+    } catch (err) {
+        return null; 
+    }
+};
+
+const checkToken =(req,res,next)=>{
+    if(verifyToken(req.headers.cookie)){
+        next()
+        return true
+    }
+    else{
+        return false
+    }
+}
+
 
 Router.route("/allBlogs").get(getAllBlogs);
-Router.route("/createBlog").post(createBlog);
+Router.route("/createBlog").post(checkToken,createBlog);
 Router.route("/blog/:id").get(getBlogById);
 
 Router.route("/profilePic").post(profilePic)
@@ -43,9 +61,10 @@ Router.route("/modifyPassword").post(modifyPassword);  //3
 
 Router.route("/verifyForgotOtp").post(verifyForgotOtp); //2
 
-Router.route("/logout").post(logOut);
+Router.route("/logout").post(checkToken,logOut);
 
 const passport = require('passport'); 
+const { trusted } = require("mongoose");
 require('../passport');
 
 Router.use(passport.initialize()); 
@@ -104,12 +123,12 @@ Router.get('/auth/google/callback',
                 httpOnly: true,
                 secure: true,
                 sameSite: "None",
-                domain:["http://localhost:3000",'http://localhost:5173','https://saisandeep-blog.netlify.app']
+                path:"/"
 
             });
         
             //res.redirect(`http://localhost:5173?userData=${userData}`)
-            res.redirect(`https://saisandeep-blog.netlify.app?userData=${userData}`)
+            res.redirect(`${process.env.FRONTEND_URL}?userData=${userData}`)
 }
 );
 

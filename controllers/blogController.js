@@ -1,7 +1,9 @@
 const Blog = require("../Models/blogModel");
+
 exports.getAllBlogs = async (req, res, next) => {
     try{
         console.log("hi raaaa")
+        console.log(req.headers.cookie)
         const allBlogs = await Blog.find();
         res.status(200).json({
             status:"success",
