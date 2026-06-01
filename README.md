@@ -1,41 +1,47 @@
+# ⚙️ Blog Platform — Back-End API
+
+This is the robust, secure, and scalable RESTful API powering the Full-Stack Blog Platform. Built to handle complex user life-cycles and content distribution, this back-end manages secure data persistence, session tracking, social authentication, and transactional email infrastructure.
+
 ---
-
-# ⚙️ Back-End README (`backend/README.md`)
-
-```markdown
-# ⚙️ Blog Platform - Back-End API
-
-This is the robust, secure REST API powering the Full-Stack Blog Platform. It handles data persistence, JWT session tracking, third-party OAuth flows, and transactional emails for user account verification.
 
 ## 🚀 Core Features
 
-*   **Hybrid Authentication System:**
-    *   Traditional email registration with secure password hashing (`bcrypt`).
-    *   **Email Verification:** Dispatches secure verification tokens via SMTP on signup.
-    *   **OAuth Integration:** Social login handling using Passport.js or custom OAuth hooks.
-*   **Secure API Architecture:** Protected endpoints backed by custom JWT verification middleware.
-*   **Blog Controller Engine:** Fully functional RESTful CRUD operations for posts.
-*   **CORS Enabled:** Secured resource sharing locked strictly to the client URL.
+### 🔐 Hybrid Authentication System
+* **Traditional Email Registration:** Secure signup flows backed by `bcrypt` password hashing.
+* **Email Verification:** Automated SMTP engine that dispatches secure, expiring verification tokens upon user registration.
+* **OAuth Integration:** Social login hooks integrated seamlessly via Passport.js for friction-free onboarding.
 
-## 🛠️ Tech Stack
+### 🛡️ Enterprise-Grade Security
+* **JWT Verification Middleware:** Custom middleware guarding protected resource endpoints.
+* **CORS-Locked Policies:** Cross-Origin Resource Sharing tightly bound exclusively to the authenticated client URL.
+* **Input Validation:** Strict sanitization of incoming payloads to eliminate malicious injections.
 
-*   **Runtime Environment:** Node.js
-*   **Framework:** Express.js
-*   **Database:** MongoDB (with Mongoose) / PostgreSQL
-*   **Authentication:** JSON Web Tokens (JWT), Passport.js
-*   **Email Service:** Nodemailer / SendGrid
+### 📝 Blog Controller Engine
+* High-performance, fully functional **RESTful CRUD operations** optimizing data flow for posts, updates, and author metrics.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Runtime Environment** | `Node.js` | High-concurrency JavaScript backend execution. |
+| **Framework** | `Express.js` | Minimalist, fast routing engine for API endpoints. |
+| **Database ORM/ODM** | `Mongoose` / `Sequelize` | Structured schema design for MongoDB or PostgreSQL. |
+| **Authentication** | `JWT` & `Passport.js` | Stateless session tracking and third-party OAuth handling. |
+| **Mailing Service** | `Nodemailer` / `SendGrid` | High-delivery transactional email dispatching. |
 
 ---
 
 ## 💻 Getting Started
 
-### Prerequisites
+### 📋 Prerequisites
 
-*   Node.js (v18 or higher)
-*   A running database instance (e.g., MongoDB Atlas or local Postgres instance)
+Before setting up the API, ensure you have the following installed on your local machine:
+* **Node.js** (v18.0.0 or higher)
+* **Database Instance** (A live connection URI for MongoDB Atlas or a local PostgreSQL instance)
 
-### Installation
 
-1. Navigate to the backend directory:
+#### 1. Navigate to the Directory
 ```bash
-   cd backend
+cd backend
